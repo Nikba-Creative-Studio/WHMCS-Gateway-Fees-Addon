@@ -54,9 +54,8 @@ function update_gateway_fee($vars)
             "duedate" => date('Y-m-d'),
             "paymentmethod" => $paymentmethod
         ]);
-
-        updateInvoiceTotal($id);
     }
+    updateInvoiceTotal($id);
 }
 
 /**

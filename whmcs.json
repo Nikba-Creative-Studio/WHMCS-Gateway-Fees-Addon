@@ -1,0 +1,30 @@
+{
+    "schema": "1.0",
+    "type": "whmcs-addons",
+    "name": "gateway_fees",
+    "license": "MIT",
+    "category": "finance",
+    "description": {
+      "name": "Gateway Fees",
+      "tagline": "Add fees based on the gateway being used.",
+      "long": "This WHMCS addon allows you to add fees based on the payment gateway being used. It supports applying fees to invoices, updating fees when payment methods are changed, and handling changes made by both clients and administrators.",
+      "features": [
+        "Add fixed and percentage-based fees for each payment gateway.",
+        "Automatically apply fees to invoices when they are created or updated.",
+        "Update fees when the payment method is changed by the client or administrator."
+      ]
+    },
+    "logo": {
+      "filename": "logo.png"
+    },
+    "support": {
+      "homepage": "https:\/\/github.com\/Nikba-Creative-Studio\/WHMCS-Gateway-Fees-Addon"
+    },
+    "authors": [
+      {
+        "name": "Nikba Creative Studio",
+        "homepage": "https:\/\/www.nikba.com\/"
+      }
+    ]
+  }
+  

@@ -11,11 +11,24 @@ use WHMCS\Database\Capsule;
  */
 function gateway_fees_config()
 {
+    // Get the system currency
+    $currencySymbol = Capsule::table('tblcurrencies')
+        ->where('default', 1)
+        ->value('code');
+
     $configarray = [
         "name" => "Gateway Fees",
         "description" => "Add fees based on the gateway being used.",
-        "version" => "1.0.1",
-        "author" => "Bargan Nicolai"
+        "version" => "1.2",
+        "author" => "Nikba Creative Studio",
+        "fields" => [
+            "enable_checkout_hook" => [
+                "FriendlyName" => "Enable displaying Fees on the checkout page",
+                "Type" => "yesno",
+                "Default" => "yes", // Default to enabled
+                "Description" => "Tick to enable displaying fees on the checkout page. Only for twenty-one Theme.",
+            ]
+        ],
     ];
 
     // Retrieve all distinct payment gateways
@@ -27,7 +40,7 @@ function gateway_fees_config()
             "FriendlyName" => $gateway->gateway,
             "Type" => "text",
             "Default" => "0.00",
-            "Description" => "$"
+            "Description" => $currencySymbol
         ];
         $configarray['fields']["fee_2_" . $gateway->gateway] = [
             "FriendlyName" => $gateway->gateway,

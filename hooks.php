@@ -197,4 +197,129 @@ function getGatewayName2($modulename)
     return $result->value;
 }
 
+/**
+ * Hook to apply and display gateway fees on the checkout page based on selected payment method.
+ */
+add_hook('ShoppingCartCheckoutOutput', 1, function ($vars) {
+    // Check if the hook is enabled in the module settings
+    $enabled = Capsule::table('tbladdonmodules')
+        ->where('module', 'gateway_fees')
+        ->where('setting', 'enable_checkout_hook')
+        ->value('value');
+
+    if ($enabled !== 'on') {
+        return; // Do not inject anything if the hook is disabled
+    }
+
+    // Get the system currency
+    $currencySymbol = Capsule::table('tblcurrencies')
+        ->where('default', 1)
+        ->value('code');
+
+    // Get all payment methods and their corresponding fees
+    $paymentMethods = Capsule::table('tblpaymentgateways')
+        ->select('gateway')
+        ->groupBy('gateway')
+        ->get();
+
+    $fees = [];
+    foreach ($paymentMethods as $method) {
+        $fee1 = Capsule::table('tbladdonmodules')
+            ->where('module', 'gateway_fees')
+            ->where('setting', 'fee_1_' . $method->gateway)
+            ->value('value');
+
+        $fee2 = Capsule::table('tbladdonmodules')
+            ->where('module', 'gateway_fees')
+            ->where('setting', 'fee_2_' . $method->gateway)
+            ->value('value');
+
+        $fees[$method->gateway] = [
+            'fee1' => (float)$fee1,
+            'fee2' => (float)$fee2,
+        ];
+    }
+
+    // Convert PHP array to JSON for use in JavaScript
+    $feesJson = json_encode($fees);
+
+    // Inject HTML and JavaScript
+    $script = <<<EOT
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Inject the Gateway Fee and Total with Fee elements into the page
+            var feeRow = '<div id="gatewayFeeRow">' +
+                         'Gateway Fee: ' +
+                         '<strong id="gatewayFee">0.00</strong> <strong> $currencySymbol </strong>' +
+                         '</div>';
+            var totalWithFeeRow = '<div id="totalWithFeeRow">' +
+                                  'Total with Fee: ' +
+                                  '<strong id="totalWithFee">0.00</strong> <strong> $currencySymbol </strong>' +
+                                  '</div>';
+                                  
+            var checkoutSummary = document.getElementById('checkoutSummary');
+            if (checkoutSummary) {
+                checkoutSummary.insertAdjacentHTML('beforeend', feeRow);
+                checkoutSummary.insertAdjacentHTML('beforeend', totalWithFeeRow);
+            } else {
+                // Fallback: insert after totalCartPrice element or another valid element
+                var totalCartPriceElement = document.getElementById('totalCartPrice');
+                if (totalCartPriceElement) {
+                    totalCartPriceElement.insertAdjacentHTML('afterend', feeRow + totalWithFeeRow);
+                }
+            }
+
+            // Define the fee structure dynamically from the backend
+            var fees = $feesJson;
+
+            // Function to update the fee and total
+            function updateGatewayFee() {
+                // Get the selected payment method
+                var selectedPaymentMethod = document.querySelector('input[name="paymentmethod"]:checked').value;
+
+                // Get the fees for the selected payment method
+                var fee1 = fees[selectedPaymentMethod]?.fee1 || 0;
+                var fee2 = fees[selectedPaymentMethod]?.fee2 || 0;
+
+                // Get the current subtotal from the element with id 'totalCartPrice'
+                var subtotalElement = document.getElementById('totalCartPrice');
+                var subtotal = parseFloat(subtotalElement ? subtotalElement.textContent.replace(/[^\d.-]/g, '') : 0);
+
+                // Calculate the fee
+                var gatewayFee = fee1 + (subtotal * fee2 / 100);
+
+                // Calculate the new total including the fee
+                var totalWithFee = subtotal + gatewayFee;
+
+                // Update the page with the fee and total
+                document.getElementById('gatewayFee').textContent = gatewayFee.toFixed(2);
+                document.getElementById('totalWithFee').textContent = totalWithFee.toFixed(2);
+            }
+
+            // Attach event listener to payment method radio buttons
+            var paymentMethods = document.querySelectorAll('input[name="paymentmethod"]');
+
+            // Use iCheck events if available
+            if (window.jQuery && jQuery().iCheck) {
+                jQuery(paymentMethods).on('ifChecked', function() {
+                    updateGatewayFee();
+                });
+            } else {
+                // Fallback to regular events
+                paymentMethods.forEach(function (method) {
+                    method.addEventListener('change', updateGatewayFee);
+                    method.addEventListener('click', updateGatewayFee);
+                });
+            }
+
+            // Run update on page load in case a payment method is already selected
+            updateGatewayFee();
+        });
+    </script>
+    EOT;
+
+    return $script;
+});
+
+
 ?>

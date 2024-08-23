@@ -40,3 +40,14 @@ For support or questions, please open an issue on the GitHub repository.
 ## License
 
 This addon is open-source and licensed under the MIT License.
+
+## Version 1.2 - Changelog
+
+### Updates and Improvements
+
+1. **Currency Display Fix**:
+   - The module now correctly displays fees in the default currency set in the WHMCS system. This fix ensures that all fees are shown in the appropriate currency without needing manual adjustments.
+
+2. **Fee Display on Checkout Page for Twenty-One Template**:
+   - Fees associated with payment methods configured via this module are now displayed on the checkout page when using the default Twenty-One template.
+   - **Note for Developers**: If you are using a custom template, you might need to make adjustments to the `ShoppingCartCheckoutOutput` hook in the `hooks.php` file to ensure that fees are displayed correctly on the checkout page.

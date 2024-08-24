@@ -211,10 +211,20 @@ add_hook('ShoppingCartCheckoutOutput', 1, function ($vars) {
         return; // Do not inject anything if the hook is disabled
     }
 
+    // Get Current user currency
+    $currency = getCurrency();
+    
+    if($currency) {
+        $currencySymbol = $currency['code'];
+    }
+    else {
+        // Get the system currency
+        $currencySymbol = Capsule::table('tblcurrencies')
+            ->where('default', 1)
+            ->value('code');
+    }
     // Get the system currency
-    $currencySymbol = Capsule::table('tblcurrencies')
-        ->where('default', 1)
-        ->value('code');
+    
 
     // Get all payment methods and their corresponding fees
     $paymentMethods = Capsule::table('tblpaymentgateways')

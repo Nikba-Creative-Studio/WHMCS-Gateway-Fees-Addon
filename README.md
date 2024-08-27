@@ -2,6 +2,8 @@
 
 This WHMCS addon allows you to add fees based on the payment gateway being used. It supports applying fees to invoices, updating fees when payment methods are changed, and handling changes made by both clients and administrators.
 
+## You like this module? [Buy me a Coffee](https://buymeacoffee.com/nikba) ☕︎
+
 ## Features
 
 - Add fixed and percentage-based fees for each payment gateway.

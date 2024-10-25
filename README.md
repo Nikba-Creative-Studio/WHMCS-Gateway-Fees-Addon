@@ -12,18 +12,20 @@ This WHMCS addon allows you to add fees based on the payment gateway being used.
 
 ## Installation
 
-1. **Download and Extract:**
-   Download the addon files and extract them to your WHMCS installation directory.
+1. **Download the addon:**
+   - Clone the repository or download the ZIP file and extract it.
 
-2. **Upload Files:**
-   Upload the `gateway_fees.php` file to `modules/addons/gateway_fees/`.
-   Upload the `hooks.php` file to `modules/addons/gateway_fees/hooks/`.
+   ```bash
+   git clone https://github.com/Nikba-Creative-Studio/WHMCS-Gateway-Fees-Addon.git
+   ```
 
-3. **Activate Addon:**
-   - Login to your WHMCS admin area.
-   - Navigate to `Setup` -> `Addon Modules`.
-   - Find the "Gateway Fees" addon and click `Activate`.
-   - Configure the addon settings as needed.
+2. **Upload the addon:**
+   - Upload the `gateway_fees` folder to the `modules/addons/` directory of your WHMCS installation.
+
+3. **Activate the addon:**
+   - Log in to your WHMCS admin panel.
+   - Go to **Setup** > **Addon Modules**.
+   - Locate **Gateway Fees** and click the **Activate** button.
 
 ## Configuration
 

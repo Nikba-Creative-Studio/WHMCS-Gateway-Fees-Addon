@@ -181,17 +181,23 @@ ppcp_respond([
  */
 function gatewayfees_ppcp_credentials(array $params)
 {
-    $clientId = $params['clientID'] ?? $params['clientId'] ?? $params['client_id'] ?? '';
-    $secret   = $params['secretKey'] ?? $params['secret'] ?? $params['clientSecret'] ?? $params['secret_key'] ?? '';
-
     $sandbox = false;
-    foreach (['sandbox', 'testMode', 'sandboxMode', 'test_mode'] as $k) {
-        if (!empty($params[$k]) && !in_array((string) $params[$k], ['off', '0', 'false', ''], true)) {
+    foreach (['useSandbox', 'sandbox', 'testMode', 'sandboxMode', 'test_mode'] as $k) {
+        if (!empty($params[$k]) && in_array(strtolower((string) $params[$k]), ['on', '1', 'true', 'yes'], true)) {
             $sandbox = true;
+            break;
         }
     }
 
-    // Fuzzy fallback if the well-known keys are absent.
+    if ($sandbox) {
+        $clientId = $params['sandboxClientId'] ?? $params['sandbox_client_id'] ?? '';
+        $secret   = $params['sandboxClientSecret'] ?? $params['sandbox_client_secret'] ?? '';
+    } else {
+        $clientId = $params['clientId'] ?? $params['clientID'] ?? $params['client_id'] ?? '';
+        $secret   = $params['clientSecret'] ?? $params['secretKey'] ?? $params['secret'] ?? '';
+    }
+
+    // Fuzzy fallback if standard keys are missing
     if (!$clientId || !$secret) {
         foreach ($params as $k => $v) {
             if (!is_string($v) || $v === '') {
